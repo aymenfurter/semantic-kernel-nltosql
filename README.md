@@ -11,6 +11,7 @@
   </p>
 
 </div>
+
 In this repo we demonstrate how to use [Semantic Kernel](https://github.com/microsoft/semantic-kernel) to convert Natural Language (NL) to SQL Query using Azure OpenAI (GPT-4 model).
 
 Semantic Kernel is an exciting framework and a powerful tool that can be used for several applications, including chatbots, virtual assistants, and more. 
