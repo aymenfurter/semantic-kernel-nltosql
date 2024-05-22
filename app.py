@@ -41,29 +41,52 @@ async def process_query(nlp_input):
     # Invoke the plan and get the result
     result = await invoke_plan(plan)
     
-    response = f'User ASK: {nlp_input}\nResponse: {result}\n'
+    debug_info = f'**User ASK:** {nlp_input}\n\n**Response:** {result}\n\n'
     
     for index, step in enumerate(plan._steps):
-        response += f"Step: {index}\nDescription: {step.description}\nFunction: {step.plugin_name}.{step._function.name}\n"
+        debug_info += f"**Step {index}:**\n- **Description:** {step.description}\n- **Function:** {step.plugin_name}.{step._function.name}\n"
         if len(step._outputs) > 0:
             output_str = result[step._outputs[0]].replace("\n", "\n  ")
-            response += f"  Output:\n{output_str}\n\n"
+            if "Message ->" in output_str:
+                output_str = output_str.split("Message ->")[1]
+            debug_info += f"  - **Output:**\n```\n{output_str}\n```\n\n"
     
-    return response
+    # Extract and return the output of step 3
+    step3_output = next(step for step in plan._steps if step.description.startswith("Write a friendly response"))._outputs[0]
+    final_output = result[step3_output]
+    if "Message ->" in final_output:
+        final_output = final_output.split("Message ->")[1].strip()
+    return final_output, debug_info
 
 def query_database(nlp_input):
     return asyncio.run(process_query(nlp_input))
 
+def populate_textbox(selected_input):
+    return selected_input
+
 with gr.Blocks() as demo:
     gr.Markdown("# Chat with your SQL")
-    gr.Markdown("Enter your natural language query below:")
+    gr.Markdown("Enter your natural language query below or select a suggested query:")
     
     with gr.Row():
         input_text = gr.Textbox(label="Enter Query")
-        output_text = gr.Textbox(label="Output", lines=10)
+        suggested_queries = gr.Dropdown(
+            choices=[
+                "I want to know how many transactions in the last 3 months",
+                "Give me the name of the best seller in terms of sales volume in the whole period",
+                "Which product has the highest sales volume in the last month"
+            ],
+            label="Suggested Queries"
+        )
+        suggested_queries.change(fn=populate_textbox, inputs=suggested_queries, outputs=input_text)
+    
+    output_text = gr.Textbox(label="Output", lines=5, interactive=False)
+    debug_output = gr.Textbox(label="Debug Information", lines=20, interactive=False)
 
     query_button = gr.Button("Submit Query")
-    query_button.click(fn=query_database, inputs=input_text, outputs=output_text)
+
+    # Connect the query button to the functions
+    query_button.click(fn=query_database, inputs=input_text, outputs=[output_text, debug_output])
 
 if __name__ == "__main__":
     demo.launch()
