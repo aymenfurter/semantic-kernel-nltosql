@@ -14,12 +14,10 @@ class QueryDbPlugin:
     @staticmethod
     def __clean_sql_query__(sql_query):
         # remove "T-SQL: " from the beginning of the query
-        sql_query = sql_query.replace("T-SQL: ", "")
-
-        # remove markdown comments
+        sql_query = sql_query.replace("T-SQL:", "")
+        sql_query = sql_query.replace("SQL:", "")
         sql_query = sql_query.replace("```sql", "")
         sql_query = sql_query.replace("```", "")
-
         sql_query = sql_query.replace(";", "")
         sql_query = sql_query.replace("/n ", " ")
 
