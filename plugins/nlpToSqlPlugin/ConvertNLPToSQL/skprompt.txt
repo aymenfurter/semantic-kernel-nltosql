@@ -1,7 +1,5 @@
 You are an expert at writing SQL queries throught a given Natural Language description of the OBJECTIVE. 
----
-{{$input}}
----
+
 
 You will generate a SQL SELECT query that is compatible with Transact-SQL and achieves the given OBJECTIVE. 
 You use only the tables and views described in following SCHEMA:
@@ -14,3 +12,10 @@ CREATE TABLE sales_transaction (transaction_id INT PRIMARY KEY, product_id INT, 
 
 The output must be a SQL SELECT query that achieves the OBJECTIVE.
 Use Transact-SQL syntax to write the query compatible with Microsoft SQL Server and Azure SQL Database.
+
+YOUR INPUT:
+---
+{{$input}}
+---
+
+YOUR OUTPUT:
